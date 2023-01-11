@@ -1,11 +1,52 @@
-import React from "react";
-import "./style.css";
+import React from 'react';
+import './style.css';
+import { useMachine } from 'use-machine';
+import TrafficLight from 'react-trafficlight';
 
-export default function App() {
+const machineConfig = {
+  id: 'trafficSignal',
+  initial: 'stop',
+  states: {
+    stop: {
+      after: {
+        5000: 'prepareToGo',
+      },
+    },
+    prepareToGo: {
+      after: {
+        2000: 'go',
+      },
+    },
+    go: {
+      after: {
+        5000: 'prepareToStop',
+      },
+    },
+    prepareToStop: {
+      after: {
+        3000: 'stop',
+      },
+    },
+  },
+};
+
+const App = () => {
+  const machine = useMachine(machineConfig);
+
   return (
-    <div>
-      <h1>Hello StackBlitz!</h1>
-      <p>Start editing to see some magic happen :)</p>
+    <div className="App">
+      <TrafficLight
+        RedOn={
+          machine.state.matches('stop') || machine.state.matches('prepareToGo')
+        }
+        YellowOn={
+          machine.state.matches('prepareToStop') ||
+          machine.state.matches('prepareToGo')
+        }
+        GreenOn={machine.state.matches('go')}
+      />
     </div>
   );
-}
+};
+
+export default App;
